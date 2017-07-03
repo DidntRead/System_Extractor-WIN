@@ -50,18 +50,22 @@ echo.
 bin\cecho       3 - {0b}Unpack{#} {0f}system.img{#}
 echo.
 echo.
-bin\cecho       4 - {0b}Sign{#} {0f}ZIP files{#}
+bin\cecho       4 - {0b}Unpack SP Flash Tools{#} {0f}system.img{#}
 echo.
 echo.
-bin\cecho       5 - {0b}Exit{#}  
+bin\cecho       5 - {0b}Sign{#} {0f}ZIP files{#}
+echo.
+echo.
+bin\cecho       6 - {0b}Exit{#}  
 echo.
 echo.
 set /p web=Type option:
 if "%web%"=="1" goto extractor
-if "%web%"=="5" goto ex_t
+if "%web%"=="6" goto ex_t
 if "%web%"=="2" goto repack
 if "%web%"=="3" goto Image_unpack
-if "%web%"=="4" goto sign
+if "%web%"=="4" goto Mtk_image_unpack
+if "%web%"=="5" goto sign
 echo.
 echo Select a valid option.....
 echo ping -n 200 -w 200 127.0.0.1 > nul
@@ -442,6 +446,42 @@ echo.
 pause
 goto home)
 ::        ----------------------End of script--------------------------   ::
+
+::                               IMAGE UNPACK SCRIPT                        ::
+:Mtk_image_unpack
+cls
+echo.
+echo.
+echo.
+echo.                                                         
+echo   Copy system.img to current folder and make sure it is  
+echo   named as system.img                                   
+echo.                                                       
+echo    * Current Folder = Folder where you have placed extractor.bat
+echo.
+echo.
+pause
+echo.
+if exist system.img echo     Found system.img
+if not exist system.img (cls &echo. &echo system.img not found , please try again with mentioned name &pause > NUL &goto :home)
+echo.
+echo  wait aprox 2-3 minutes
+::FOR 
+echo.
+bin\dd.exe if=system.img of=system_noheader.img bs=64 skip=257 >nul 2>&1
+del system.img
+bin\Imgextractor.exe system_noheader.img
+if "%errorlevel%"=="0" (if exist system rd /s /q system &MOVE system_ system &del system.img 
+echo.
+echo Files = "system" folder
+echo.
+echo  If the extraction failed then your Image file may be sparse format
+echo  try again by converting it to ext4 format by simg2img binary found in bin
+echo.
+pause
+goto home)
+::        ----------------------End of script--------------------------   ::
+
 
 ::                            Sign Zip Files Script                       ::                  
 :sign
